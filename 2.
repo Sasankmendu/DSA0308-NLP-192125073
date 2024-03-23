@@ -1,0 +1,56 @@
+class State:
+    def __init__(self, name):
+        self.name = name
+        self.transitions = {}
+    def add_transition(self, input_symbol, next_state):
+        self.transitions[input_symbol] = next_state
+    def next_state(self, input_symbol):
+        return self.transitions.get(input_symbol)
+class FiniteAutomaton:
+    def __init__(self):
+        self.states = {}
+        self.current_state = None
+        self.start_state = None
+    def add_state(self, state):
+        self.states[state.name] = state
+    def set_start_state(self, state_name):
+        self.start_state = self.states[state_name]
+        self.current_state = self.start_state
+    def reset(self):
+        self.current_state = self.start_state
+    def input_symbol(self, symbol):
+        if self.current_state is None:
+            raise Exception("No start state set")
+        next_state = self.current_state.next_state(symbol)
+        if next_state is None:
+            return False
+        self.current_state = next_state
+        return True
+    def is_accepted(self):
+        return self.current_state == self.states['q1']
+# Creating states
+q0 = State('q0')
+q1 = State('q1')
+
+# Adding transitions
+q0.add_transition('a', q0)
+q0.add_transition('b', q1)
+
+# Creating finite automaton
+automaton = FiniteAutomaton()
+automaton.add_state(q0)
+automaton.add_state(q1)
+automaton.set_start_state('q0')
+
+# Test strings
+test_strings = ['ab', 'aab', 'abb', 'aaab', 'abab', 'abc']
+
+# Test the automaton
+for string in test_strings:
+    automaton.reset()
+    for char in string:
+        automaton.input_symbol(char)
+    if automaton.is_accepted():
+        print(f"'{string}' is accepted")
+    else:
+        print(f"'{string}' is not accepted")
